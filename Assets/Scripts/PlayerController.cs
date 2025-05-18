@@ -22,7 +22,10 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool canLook = true;
 
-    private Rigidbody rigidbody;
+    private new Rigidbody rigidbody;
+    
+    // 인벤토리 관련
+    public event Action inventory;
 
     private void Awake()
     {
@@ -132,5 +135,17 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
+    }
+
+    // 인벤토리 토글 입력 처리
+    public void OnInventoryInput(InputAction.CallbackContext context)
+    {
+        if(context.phase == InputActionPhase.Started)
+        {
+            if (inventory != null)
+            {
+                inventory();
+            }
+        }
     }
 }

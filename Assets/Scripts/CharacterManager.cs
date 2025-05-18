@@ -1,44 +1,45 @@
 using UnityEngine;
 
-// 싱글톤 패턴
+// 캐릭터 관리를 위한 싱글톤 매니저
 public class CharacterManager : MonoBehaviour
 {
-    private static CharacterManager _instance;
-    public static CharacterManager Instance
-    {
-        get
-        {
-        // 할당되지 않았을 때, 외부에서 CharacterManager.Instance 로 접근하는 경우
-        // 게임 오브젝트를 만들어주고 CharacterManager 스크립트를 AddComponent
-            if(_instance == null) 
-            {
-                _instance = new GameObject("CharacerManager").AddComponent<CharacterManager>();
-            }
-            return _instance;
-        }
-    }
+    public static CharacterManager Instance { get; private set; }
 
-		// 나중에 수정될 경우를 고려하여 원본(_player)과 접근(Player)을 구별
-    public Player Player
-    {
+    public GameObject playerObject;
+    
+    private PlayerCondition _player;
+    public PlayerCondition Player 
+    { 
         get { return _player; }
-        set { _player = value; }
+        set { _player = value; } 
     }
-    private Player _player;
 
     private void Awake()
     {
-        if(_instance == null)
+        // 싱글톤 설정
+        if (Instance == null)
         {
-            _instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
         {
-            if(_instance != this)
+            Destroy(gameObject);
+            return;
+        }
+
+        // 플레이어 컴포넌트 가져오기
+        if (playerObject != null)
+        {
+            _player = playerObject.GetComponent<PlayerCondition>();
+            if (_player == null)
             {
-                Destroy(gameObject);
+                _player = playerObject.AddComponent<PlayerCondition>();
             }
+        }
+        else
+        {
+            Debug.LogError("플레이어 오브젝트가 할당되지 않았습니다!");
         }
     }
 }
